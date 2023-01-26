@@ -1,6 +1,6 @@
-import { RsaEncoder } from './models';
+import { RSAEncoder } from './models';
 
-const rsa = new RsaEncoder();
+const rsa = new RSAEncoder();
 
 rsa.encrypt({
   filenameToRead: {

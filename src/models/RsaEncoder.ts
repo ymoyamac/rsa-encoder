@@ -2,7 +2,7 @@ import fs from 'fs';
 import NodeRSA from 'node-rsa';
 import { DecryptOptions, EncryptOptions } from '../interfaces';
 
-export class RsaEncoder {
+export class RSAEncoder {
   
   private PATH: string = `./src`;
 
