@@ -2,17 +2,22 @@ import NodeRSA from 'node-rsa';
 
 export interface FilenameStructure {
   name: string;
-  extension: string;
+  extension?: string;
 }
 
-export interface EncryptOptions {
-  key?: NodeRSA;
+export interface FilenameOptions {
   filenameToRead: FilenameStructure;
-  newFilename: string;
+  newFilename?: FilenameStructure;
 }
 
 export interface DecryptOptions {
   key: NodeRSA;
   encryptedInformation?: string;
   filePath: string;
+}
+
+export interface FileContentOptions {
+  path?: string;
+  file: FilenameStructure;
+  content: string
 }

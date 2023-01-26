@@ -1,11 +1,22 @@
-import { RSAEncoder } from './models';
+import { RSAEncoder, RSAFile } from './models';
 
-const rsa = new RSAEncoder();
+const rsaFile: RSAFile = new RSAFile();
+const rsa = new RSAEncoder(rsaFile);
 
 rsa.encrypt({
   filenameToRead: {
     name: 'cifrar',
     extension: 'txt'
   },
-  newFilename: 'newFilenameGenerated',
+  newFilename: {
+    name: 'newFile',
+    extension: 'rsa'
+  },
+});
+
+rsa.decrypt({
+  filenameToRead: {
+    name: 'newFile',
+    extension: 'rsa'
+  },
 });

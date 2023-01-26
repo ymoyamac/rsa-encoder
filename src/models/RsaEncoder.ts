@@ -1,41 +1,39 @@
-import fs from 'fs';
 import NodeRSA from 'node-rsa';
-import { DecryptOptions, EncryptOptions } from '../interfaces';
+import { FilenameOptions } from '../interfaces';
+import { RSAFile } from './RSAFile';
 
 export class RSAEncoder {
-  
-  private PATH: string = `./src`;
+  private PATH: string = `./src/uploads`;
+  private key: NodeRSA = new NodeRSA({ b: 512 });
 
   constructor(
+    private readonly rsaFile: RSAFile,
     private bits?: number,
     private exp?: number
-  ){}
+  ) {}
 
   private generateNodeRSAKey = (): NodeRSA => {
-    const key = new NodeRSA({ b: 512 });
-    //key.generateKeyPair(this.bits, this.exp);
-    return key;
+    //this.key.generateKeyPair(this.bits, this.exp);
+    return this.key;
   }
 
-  private verifyNameOfNewFile() {
-    console.log(this.PATH);
-    const dir = fs.readdirSync(this.PATH);
-    console.log(dir)
-  }
 
-  public encrypt({ filenameToRead, newFilename }: EncryptOptions): string | void {
+  public encrypt({ filenameToRead, newFilename, }: FilenameOptions): string | void {
     try {
-      this.verifyNameOfNewFile()
-      const data: string = fs.readFileSync(
-        `./src/uploads/${filenameToRead.name}.${filenameToRead.extension}`,
-        'utf-8'
+      const path = `${this.PATH}/${filenameToRead.name}.${filenameToRead.extension}`;
+      const data = this.rsaFile.readFileContent(path) as string;
+      console.log(data);
+      const encrypted: string = this.key.encrypt(
+        data,
+        'base64'
       );
-      console.log(data)
-      const encrypted: string = this.generateNodeRSAKey().encrypt(data, 'base64');
       if (!encrypted) {
         throw new Error('Oops... Someting went wrong');
       }
-      fs.writeFileSync(`./src/uploads/${newFilename}.rsa`, encrypted);
+      this.rsaFile.writeEncryptedContentToFile({
+        file: { name: newFilename!.name, extension: 'rsa' },
+        content: encrypted,
+      });
       console.log('encrypted: ', encrypted);
       return encrypted;
     } catch (error) {
@@ -43,13 +41,14 @@ export class RSAEncoder {
     }
   }
 
-  public decrypt({ filePath }: DecryptOptions): void{
-    const encryptedInformation: string = fs.readFileSync(
-      `${filePath}`,
-      'utf-8'
-    );
-    const decrypted = this.generateNodeRSAKey().decrypt(encryptedInformation, 'utf8');
+  public decrypt({filenameToRead}: FilenameOptions): void {
+    const path = `${this.PATH}/${filenameToRead.name}.${filenameToRead.extension}`;
+    const encryptedInformation = this.rsaFile.readFileContent(path) as string;
+    const decrypted = this.key.decrypt(encryptedInformation, 'utf8');
+    if (!decrypted) {
+      throw new Error('Oops... Someting went wrong');
+    }
     console.log('decrypted: ', decrypted);
-    console.log('size: ', this.generateNodeRSAKey().getKeySize());
+    console.log('size: ', this.key.getKeySize());
   }
 }
