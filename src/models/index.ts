@@ -1,1 +1,1 @@
-export * from './RsaEncryption';
+export * from './RsaEncoder';
